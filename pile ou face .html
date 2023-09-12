@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Animation de pièce en l'air</title>
+    <style>
+        /* Définir les styles pour l'animation */
+        @keyframes tourner {
+            0%, 50% { transform: rotateY(0deg); }
+            100% { transform: rotateY(3600deg); }
+        }
+
+        /* Appliquer les styles à l'élément */
+        #piece {
+            width: 100px;
+            height: 100px;
+            background-color: gold;
+            border-radius: 50%;
+            animation: none;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        /* Styles pour le texte */
+        #piece-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            color: lightyellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Animation de pièce en l'air</h1>
+    <p>Cliquez sur le bouton pour choisir "Pile" ou "Face" :</p>
+    <button id="pile" onclick="choisir('pile')">Pile</button>
+    <button id="face" onclick="choisir('face')">Face</button>
+    <p>Ensuite, cliquez sur le bouton pour lancer la pièce en l'air :</p>
+    <button id="lancer" onclick="lancerPiece()">Lancer la pièce</button>
+    <div id="piece">
+        <div id="piece-text">Pile</div>
+    </div>
+    <p id="resultat" style="display: none;"></p>
+    <p id="score">Score : 0</p>
+
+    <script>
+        var choix = '';
+        var score = 0;
+        var animationEnCours = false;
+
+        function choisir(option) {
+            choix = option;
+            document.getElementById("pile").disabled = true;
+            document.getElementById("face").disabled = true;
+            document.getElementById("lancer").disabled = false;
+        }
+
+        function lancerPiece() {
+            if (animationEnCours) {
+                return; // Ne pas permettre un autre lancer pendant l'animation en cours
+            }
+
+            var piece = document.getElementById("piece");
+            var pieceText = document.getElementById("piece-text");
+            var resultat = document.getElementById("resultat");
+            var scoreLabel = document.getElementById("score");
+
+            // Bloquer les boutons pendant l'animation
+            document.getElementById("pile").disabled = true;
+            document.getElementById("face").disabled = true;
+            document.getElementById("lancer").disabled = true;
+
+            // Réinitialiser l'animation pour la relancer
+            piece.style.animation = "none";
+            pieceText.style.display = "none";
+            animationEnCours = true;
+            setTimeout(function() {
+                piece.style.animation = "tourner 4s linear";
+                pieceText.style.display = "block";
+            }, 10);
+
+            // Attendez la fin de l'animation, puis affichez le résultat
+            setTimeout(function() {
+                var resultatAleatoire = Math.random() < 0.5 ? "Pile" : "Face";
+                pieceText.textContent = resultatAleatoire;
+
+                if (choix === resultatAleatoire.toLowerCase()) {
+                    resultat.textContent = "Gagné !";
+                    score++;
+                } else {
+                    resultat.textContent = "Perdu !";
+                    score--;
+                }
+
+                resultat.style.display = "block";
+                scoreLabel.textContent = "Score : " + score;
+                animationEnCours = false;
+
+                // Débloquer les boutons après l'animation
+                document.getElementById("pile").disabled = false;
+                document.getElementById("face").disabled = false;
+                document.getElementById("lancer").disabled = false;
+            }, 4000); // Attendez 4 secondes pour afficher le résultat
+        }
+    </script>
+</body>
+</html>
